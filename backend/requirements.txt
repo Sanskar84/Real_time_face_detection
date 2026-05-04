@@ -1,0 +1,17 @@
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+pydantic-settings==2.2.1
+
+# Async PostgreSQL
+asyncpg==0.29.0
+SQLAlchemy[asyncio]==2.0.30
+
+# Image processing — drawing ROI without OpenCV
+Pillow==10.3.0
+
+# Face detection — MediaPipe (does NOT require importing cv2)
+mediapipe==0.10.14
+
+# Multipart / WebSocket helpers
+python-multipart==0.0.9
+websockets==12.0
