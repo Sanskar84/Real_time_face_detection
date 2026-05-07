@@ -2,6 +2,7 @@ import uuid
 from datetime import datetime
 
 from sqlalchemy import BigInteger, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -14,7 +15,7 @@ class Frame(Base):
     __table_args__ = (UniqueConstraint("session_id", "frame_seq"),)
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    session_id: Mapped[str] = mapped_column(String(36), nullable=False)  # UUID as string
+    session_id: Mapped[str] = mapped_column(PG_UUID(as_uuid=False), nullable=False)
     frame_seq: Mapped[int] = mapped_column(Integer, nullable=False)
     captured_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
