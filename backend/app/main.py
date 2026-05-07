@@ -4,7 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import engine, Base
+from app.database import engine
+from app.routers import roi, stream
 
 
 @asynccontextmanager
@@ -27,6 +28,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(stream.router)
+app.include_router(roi.router)
 
 
 @app.get("/health", tags=["ops"])
