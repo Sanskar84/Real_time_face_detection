@@ -14,8 +14,9 @@ const WS_BASE = import.meta.env.VITE_WS_URL ?? "";
 const FRAME_INTERVAL_MS = 100; // ~10 fps — adjust as needed
 
 export function useStream(sessionId) {
-  const [status, setStatus]   = useState("idle");
-  const [feedSrc, setFeedSrc] = useState(null);
+  const [status, setStatus]       = useState("idle");
+  const [feedSrc, setFeedSrc]     = useState(null);
+  const [frameCount, setFrameCount] = useState(0);
 
   const ingestWsRef  = useRef(null);
   const feedWsRef    = useRef(null);
@@ -40,6 +41,7 @@ export function useStream(sessionId) {
       prevBlobUrl.current = null;
     }
     setFeedSrc(null);
+    setFrameCount(0);
     setStatus("idle");
   }, []);
 
@@ -84,6 +86,7 @@ export function useStream(sessionId) {
           prevBlobUrl.current = url;
           return url;
         });
+        setFrameCount((n) => n + 1);
       };
 
       feedWs.onerror = () => setStatus("error");
@@ -110,5 +113,5 @@ export function useStream(sessionId) {
     }
   }, [sessionId, stop]);
 
-  return { feedSrc, status, start, stop };
+  return { feedSrc, status, frameCount, start, stop };
 }
