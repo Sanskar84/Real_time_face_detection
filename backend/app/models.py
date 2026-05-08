@@ -14,8 +14,8 @@ class Frame(Base):
     __tablename__ = "frames"
     __table_args__ = (UniqueConstraint("session_id", "frame_seq"),)
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    session_id: Mapped[str] = mapped_column(PG_UUID(as_uuid=False), nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
+    session_id: Mapped[str] = mapped_column(PG_UUID(as_uuid=False).with_variant(String(36), "sqlite"), nullable=False)
     frame_seq: Mapped[int] = mapped_column(Integer, nullable=False)
     captured_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
@@ -29,8 +29,8 @@ class RoiDetection(Base):
 
     __tablename__ = "roi_detections"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
-    frame_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("frames.id", ondelete="CASCADE"), nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
+    frame_id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer, "sqlite"), ForeignKey("frames.id", ondelete="CASCADE"), nullable=False)
     x: Mapped[int] = mapped_column(Integer, nullable=False)
     y: Mapped[int] = mapped_column(Integer, nullable=False)
     width: Mapped[int] = mapped_column(Integer, nullable=False)

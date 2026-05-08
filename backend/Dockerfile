@@ -37,6 +37,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY app/ ./app/
+COPY tests/ ./tests/
+COPY pytest.ini ./
 
 # Run as non-root for security
 RUN adduser --disabled-password --gecos "" appuser
