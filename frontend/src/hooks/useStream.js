@@ -2,8 +2,10 @@
  * useStream — manages the full webcam → ingest WS → feed WS pipeline.
  *
  * Returns:
+ *   sessionId : string         — current session UUID (new one generated each Start)
  *   feedSrc   : string | null  — object URL of the latest annotated frame
  *   status    : "idle" | "live" | "error"
+ *   frameCount: number
  *   start()   : open webcam, connect both WebSockets, begin streaming
  *   stop()    : close everything
  */
@@ -13,10 +15,11 @@ import { useCallback, useRef, useState } from "react";
 const WS_BASE = import.meta.env.VITE_WS_URL ?? "";
 const FRAME_INTERVAL_MS = 100; // ~10 fps — adjust as needed
 
-export function useStream(sessionId) {
-  const [status, setStatus]       = useState("idle");
-  const [feedSrc, setFeedSrc]     = useState(null);
-  const [frameCount, setFrameCount] = useState(0);
+export function useStream() {
+  const [sessionId, setSessionId]     = useState(() => crypto.randomUUID());
+  const [status, setStatus]           = useState("idle");
+  const [feedSrc, setFeedSrc]         = useState(null);
+  const [frameCount, setFrameCount]   = useState(0);
 
   const ingestWsRef  = useRef(null);
   const feedWsRef    = useRef(null);
@@ -47,6 +50,10 @@ export function useStream(sessionId) {
 
   const start = useCallback(async () => {
     try {
+      // Fresh session ID every time Start is pressed — avoids stale queue sentinel
+      const newSessionId = crypto.randomUUID();
+      setSessionId(newSessionId);
+
       // 1. Get webcam
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       streamRef.current = stream;
@@ -65,7 +72,7 @@ export function useStream(sessionId) {
       const ctx = canvas.getContext("2d");
 
       // 4. Open ingest WebSocket
-      const ingestWs = new WebSocket(`${WS_BASE}/ws/ingest/${sessionId}`);
+      const ingestWs = new WebSocket(`${WS_BASE}/ws/ingest/${newSessionId}`);
       ingestWs.binaryType = "arraybuffer";
       ingestWsRef.current = ingestWs;
 
@@ -75,7 +82,7 @@ export function useStream(sessionId) {
       });
 
       // 5. Open feed WebSocket
-      const feedWs = new WebSocket(`${WS_BASE}/ws/feed/${sessionId}`);
+      const feedWs = new WebSocket(`${WS_BASE}/ws/feed/${newSessionId}`);
       feedWs.binaryType = "blob";
       feedWsRef.current = feedWs;
 
@@ -113,5 +120,5 @@ export function useStream(sessionId) {
     }
   }, [sessionId, stop]);
 
-  return { feedSrc, status, frameCount, start, stop };
+  return { sessionId, feedSrc, status, frameCount, start, stop };
 }

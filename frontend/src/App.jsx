@@ -1,18 +1,13 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { VideoPane } from "./components/VideoPane.jsx";
 import { RoiTable } from "./components/RoiTable.jsx";
 import { useStream } from "./hooks/useStream.js";
 import { useRoi } from "./hooks/useRoi.js";
 import { useTheme } from "./hooks/useTheme.js";
 
-function newSessionId() {
-  return crypto.randomUUID();
-}
-
 export default function App() {
-  const sessionId  = useMemo(newSessionId, []);
   const { theme, toggle } = useTheme();
-  const { feedSrc, status, start, stop, frameCount } = useStream(sessionId);
+  const { sessionId, feedSrc, status, frameCount, start, stop } = useStream();
   const detections = useRoi(sessionId, status === "live");
 
   const [copied, setCopied] = useState(false);
