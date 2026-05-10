@@ -152,3 +152,24 @@ Documented in `.env.example`. Copy to `.env` before running.
 | `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS allowed origins |
 | `VITE_WS_URL` | `ws://localhost:8000` | WebSocket base URL for frontend |
 | `VITE_API_URL` | `http://localhost:8000` | REST base URL for frontend |
+
+---
+
+## AI Collaboration Attestation
+
+**Tool used:** GitHub Copilot (Claude Sonnet 4.6) via VS Code
+
+| Area | How AI was used | Human decision |
+|---|---|---|
+| **Architecture** | Suggested 3-container Compose layout (db / backend / frontend) | Chose PostgreSQL over alternatives; approved separation of concerns |
+| **`detector.py`** | Generated MediaPipe + Pillow integration to avoid OpenCV | Decided on BlazeFace short-range model; reviewed bbox clipping logic |
+| **`routers/stream.py`** | Generated async WebSocket ingest/feed with `asyncio.Queue` | Chose `maxsize=30` backpressure and empty-bytes sentinel design |
+| **`routers/roi.py`** | Generated paginated REST endpoint with 404/empty-list distinction | Reviewed HTTP semantics and SQLAlchemy join query |
+| **`models.py`** | Generated ORM models; fixed `UUID` vs `String` type mismatch | Diagnosed `operator does not exist: uuid = character varying` runtime error |
+| **DB schema** | Generated `init.sql` table definitions and indexes | Chose 1-to-many `frames → roi_detections` over flat table |
+| **Frontend hooks** | Generated `useStream`, `useRoi`, `useTheme` | Identified stop/restart bug (stale queue sentinel); directed fresh session ID fix |
+| **Tests** | Generated pytest fixtures and test cases | Reviewed mock structure, SQLite compatibility shim, assertion tolerances |
+| **README & diagram** | Generated content and matplotlib diagram script | Reviewed for accuracy; deleted generator script before committing |
+
+All generated code was reviewed, debugged, and understood before committing. Runtime bugs (UUID type mismatch, stop/restart freeze) were diagnosed collaboratively and fixed with targeted edits.
+
